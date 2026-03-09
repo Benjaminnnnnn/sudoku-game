@@ -1,5 +1,6 @@
 import React from 'react';
 import { useSudoku } from '../hooks/useSudoku';
+import { canEditBoard } from '../lib/gameStatus';
 import { Header } from './Header';
 import { SudokuBoard } from './SudokuBoard';
 import { Controls } from './Controls';
@@ -41,7 +42,7 @@ export const Game: React.FC = () => {
         onSetValue={setCellValue}
         onUndo={undo}
         onReset={resetPuzzle}
-        disabled={gameState.status !== 'playing'}
+        disabled={!canEditBoard(gameState.status)}
       />
     </div>
   );

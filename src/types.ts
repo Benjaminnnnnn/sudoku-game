@@ -1,4 +1,5 @@
 export type Difficulty = 'easy' | 'medium' | 'hard';
+export type GameStatus = 'playing' | 'paused' | 'completed' | 'lost';
 
 export interface CellState {
   row: number;
@@ -13,7 +14,7 @@ export interface GameState {
   board: CellState[][];
   solution: number[][];
   difficulty: Difficulty;
-  status: 'playing' | 'paused' | 'completed';
+  status: GameStatus;
   timer: number;
   mistakes: number;
   notesMode: boolean;

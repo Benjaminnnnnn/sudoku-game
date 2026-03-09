@@ -1,4 +1,5 @@
 import React, { useEffect } from 'react';
+import { canEditBoard } from '../lib/gameStatus';
 import { GameState } from '../types';
 import { SudokuCell } from './SudokuCell';
 
@@ -19,7 +20,7 @@ export const SudokuBoard: React.FC<SudokuBoardProps> = ({
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
-      if (status !== 'playing') return;
+      if (!canEditBoard(status)) return;
 
       if (e.key >= '1' && e.key <= '9') {
         onSetValue(parseInt(e.key, 10));
@@ -82,6 +83,14 @@ export const SudokuBoard: React.FC<SudokuBoardProps> = ({
           <div className="text-center">
             <span className="text-4xl font-bold text-emerald-600 block mb-2">Solved!</span>
             <span className="text-emerald-800 font-medium">Great job!</span>
+          </div>
+        </div>
+      )}
+      {status === 'lost' && (
+        <div className="absolute inset-0 bg-rose-100/90 backdrop-blur-sm flex items-center justify-center z-10">
+          <div className="text-center">
+            <span className="text-4xl font-bold text-rose-600 block mb-2">Game Over</span>
+            <span className="text-rose-800 font-medium">Three mistakes reached.</span>
           </div>
         </div>
       )}

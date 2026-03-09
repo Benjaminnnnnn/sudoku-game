@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import { generateSudoku } from '../lib/sudoku';
+import { canEditBoard, resolveStatusAfterMove } from '../lib/gameStatus';
 import { CellState, Difficulty, GameState } from '../types';
 
 export function useSudoku() {
@@ -58,25 +59,25 @@ export function useSudoku() {
   }, [gameState.status]);
 
   const selectCell = (row: number, col: number) => {
-    if (gameState.status !== 'playing') return;
+    if (!canEditBoard(gameState.status)) return;
     setGameState((prev) => ({ ...prev, selectedCell: { row, col } }));
   };
 
   const moveSelection = (dRow: number, dCol: number) => {
-    if (!gameState.selectedCell || gameState.status !== 'playing') return;
+    if (!gameState.selectedCell || !canEditBoard(gameState.status)) return;
     const newRow = Math.max(0, Math.min(8, gameState.selectedCell.row + dRow));
     const newCol = Math.max(0, Math.min(8, gameState.selectedCell.col + dCol));
     setGameState((prev) => ({ ...prev, selectedCell: { row: newRow, col: newCol } }));
   };
 
   const setCellValue = (val: number) => {
-    if (!gameState.selectedCell || gameState.status !== 'playing') return;
-    const { row, col } = gameState.selectedCell;
-    const cell = gameState.board[row][col];
-
-    if (cell.isFixed) return;
+    if (!gameState.selectedCell || !canEditBoard(gameState.status)) return;
 
     setGameState((prev) => {
+      if (!prev.selectedCell || !canEditBoard(prev.status)) return prev;
+      const { row, col } = prev.selectedCell;
+      if (prev.board[row][col].isFixed) return prev;
+
       const newBoard = prev.board.map((r) => r.map((c) => ({ ...c, notes: new Set(c.notes) })));
       const newCell = newBoard[row][col];
 
@@ -115,13 +116,14 @@ export function useSudoku() {
         ...prev,
         board: newBoard,
         mistakes,
-        status: isCompleted ? 'completed' : prev.status,
+        status: resolveStatusAfterMove(prev.status, mistakes, isCompleted),
         history: [...prev.history, newBoard],
       };
     });
   };
 
   const toggleNotesMode = () => {
+    if (!canEditBoard(gameState.status)) return;
     setGameState((prev) => ({ ...prev, notesMode: !prev.notesMode }));
   };
 
@@ -154,7 +156,12 @@ export function useSudoku() {
   const togglePause = () => {
     setGameState((prev) => ({
       ...prev,
-      status: prev.status === 'playing' ? 'paused' : 'playing',
+      status:
+        prev.status === 'playing'
+          ? 'paused'
+          : prev.status === 'paused'
+            ? 'playing'
+            : prev.status,
     }));
   };
 

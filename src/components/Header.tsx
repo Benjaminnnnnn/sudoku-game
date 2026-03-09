@@ -1,12 +1,13 @@
 import React from 'react';
-import { Difficulty } from '../types';
+import { MAX_MISTAKES } from '../lib/gameStatus';
+import { Difficulty, GameStatus } from '../types';
 import { Play, Pause } from 'lucide-react';
 
 interface HeaderProps {
   difficulty: Difficulty;
   timer: number;
   mistakes: number;
-  status: 'playing' | 'paused' | 'completed';
+  status: GameStatus;
   onNewGame: (difficulty: Difficulty) => void;
   onTogglePause: () => void;
 }
@@ -50,14 +51,14 @@ export const Header: React.FC<HeaderProps> = ({
       
       <div className="flex items-center justify-between text-slate-600 text-sm font-medium">
         <div className="flex items-center gap-4">
-          <span>Mistakes: {mistakes}/3</span>
+          <span>Mistakes: {mistakes}/{MAX_MISTAKES}</span>
           <span>{difficulty.charAt(0).toUpperCase() + difficulty.slice(1)}</span>
         </div>
         <div className="flex items-center gap-2">
           <span className="font-mono text-base">{formatTime(timer)}</span>
           <button
             onClick={onTogglePause}
-            disabled={status === 'completed'}
+            disabled={status === 'completed' || status === 'lost'}
             className="p-1.5 rounded-full hover:bg-slate-100 text-slate-500 hover:text-indigo-600 transition-colors disabled:opacity-50"
           >
             {status === 'paused' ? <Play size={18} /> : <Pause size={18} />}
