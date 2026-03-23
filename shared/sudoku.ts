@@ -1,4 +1,4 @@
-export type Board = number[][];
+import { Board, Difficulty } from './types';
 
 export function isValid(board: Board, row: number, col: number, num: number): boolean {
   for (let i = 0; i < 9; i++) {
@@ -49,8 +49,10 @@ function countSolutions(board: Board, count: { value: number }) {
   count.value++;
 }
 
-export function generateSudoku(difficulty: 'easy' | 'medium' | 'hard') {
-  const board: Board = Array(9).fill(null).map(() => Array(9).fill(0));
+export function generateSudoku(difficulty: Difficulty) {
+  const board: Board = Array(9)
+    .fill(null)
+    .map(() => Array(9).fill(0));
   fillBoard(board);
   const solution = board.map((row) => [...row]);
 
@@ -74,7 +76,7 @@ export function generateSudoku(difficulty: 'easy' | 'medium' | 'hard') {
       const count = { value: 0 };
       countSolutions(puzzle, count);
       if (count.value !== 1) {
-        puzzle[r][c] = backup; // Put it back if it breaks uniqueness
+        puzzle[r][c] = backup;
       } else {
         removed++;
       }

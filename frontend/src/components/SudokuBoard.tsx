@@ -1,5 +1,6 @@
 import React, { useEffect } from 'react';
 import { canEditBoard } from '../lib/gameStatus';
+import { formatScore } from '../lib/score';
 import { GameState } from '../types';
 import { SudokuCell } from './SudokuCell';
 
@@ -78,19 +79,19 @@ export const SudokuBoard: React.FC<SudokuBoardProps> = ({
           <span className="text-3xl font-bold text-slate-800">Paused</span>
         </div>
       )}
+      {gameState.isLoading && board.length > 0 && (
+        <div className="absolute inset-0 bg-slate-100/70 backdrop-blur-sm flex items-center justify-center z-10">
+          <span className="text-lg font-semibold text-slate-800">Working...</span>
+        </div>
+      )}
       {status === 'completed' && (
         <div className="absolute inset-0 bg-emerald-100/90 backdrop-blur-sm flex items-center justify-center z-10">
           <div className="text-center">
             <span className="text-4xl font-bold text-emerald-600 block mb-2">Solved!</span>
-            <span className="text-emerald-800 font-medium">Great job!</span>
-          </div>
-        </div>
-      )}
-      {status === 'lost' && (
-        <div className="absolute inset-0 bg-rose-100/90 backdrop-blur-sm flex items-center justify-center z-10">
-          <div className="text-center">
-            <span className="text-4xl font-bold text-rose-600 block mb-2">Game Over</span>
-            <span className="text-rose-800 font-medium">Three mistakes reached.</span>
+            <span className="text-emerald-800 font-medium block">Final score: {formatScore(gameState.timer)}</span>
+            <span className="text-emerald-700 text-sm">
+              Best: {gameState.bestScores[gameState.difficulty] === null ? '--:--' : formatScore(gameState.bestScores[gameState.difficulty] as number)}
+            </span>
           </div>
         </div>
       )}

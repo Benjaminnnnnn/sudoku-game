@@ -1,6 +1,6 @@
-import { GameStatus } from '../types';
+import { GameStatus } from './types';
 
-export const MAX_MISTAKES = 3;
+export const INVALID_MOVE_PENALTY_SECONDS = 30;
 
 export function canEditBoard(status: GameStatus): boolean {
   return status === 'playing';
@@ -8,10 +8,8 @@ export function canEditBoard(status: GameStatus): boolean {
 
 export function resolveStatusAfterMove(
   currentStatus: GameStatus,
-  mistakes: number,
-  isCompleted: boolean
+  isCompleted: boolean,
 ): GameStatus {
   if (isCompleted) return 'completed';
-  if (canEditBoard(currentStatus) && mistakes >= MAX_MISTAKES) return 'lost';
   return currentStatus;
 }

@@ -27,7 +27,15 @@ export const Game: React.FC = () => {
         status={gameState.status}
         onNewGame={startNewGame}
         onTogglePause={togglePause}
+        isLoading={gameState.isLoading}
+        bestScore={gameState.bestScores[gameState.difficulty]}
       />
+
+      {gameState.errorMessage ? (
+        <div className="w-full max-w-md mx-auto mb-4 rounded-md border border-rose-200 bg-rose-50 px-4 py-3 text-sm text-rose-700">
+          {gameState.errorMessage}
+        </div>
+      ) : null}
       
       <SudokuBoard
         gameState={gameState}
@@ -42,7 +50,7 @@ export const Game: React.FC = () => {
         onSetValue={setCellValue}
         onUndo={undo}
         onReset={resetPuzzle}
-        disabled={!canEditBoard(gameState.status)}
+        disabled={gameState.isLoading || gameState.board.length === 0 || !canEditBoard(gameState.status)}
       />
     </div>
   );
