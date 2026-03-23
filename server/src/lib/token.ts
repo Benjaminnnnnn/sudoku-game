@@ -1,4 +1,4 @@
-import { PuzzlePayload } from '../../../shared/types';
+import type { PuzzlePayload } from '../../../shared/types.ts';
 
 const encoder = new TextEncoder();
 const decoder = new TextDecoder();
@@ -12,8 +12,13 @@ async function createEncryptionKey(secret: string) {
 }
 
 function toBase64Url(bytes: Uint8Array): string {
-  return Buffer.from(bytes)
-    .toString('base64')
+  let binary = '';
+
+  for (const byte of bytes) {
+    binary += String.fromCharCode(byte);
+  }
+
+  return btoa(binary)
     .replace(/\+/g, '-')
     .replace(/\//g, '_')
     .replace(/=+$/g, '');
@@ -21,7 +26,14 @@ function toBase64Url(bytes: Uint8Array): string {
 
 function fromBase64Url(value: string): Uint8Array {
   const paddedValue = value.replace(/-/g, '+').replace(/_/g, '/').padEnd(Math.ceil(value.length / 4) * 4, '=');
-  return new Uint8Array(Buffer.from(paddedValue, 'base64'));
+  const binary = atob(paddedValue);
+  const bytes = new Uint8Array(binary.length);
+
+  for (let index = 0; index < binary.length; index++) {
+    bytes[index] = binary.charCodeAt(index);
+  }
+
+  return bytes;
 }
 
 export async function encodeGameToken(payload: PuzzlePayload, secret: string): Promise<string> {
@@ -45,17 +57,16 @@ export async function encodeGameToken(payload: PuzzlePayload, secret: string): P
 }
 
 export async function decodeGameToken(token: string, secret: string): Promise<PuzzlePayload> {
-  const tokenBytes = fromBase64Url(token);
-
-  if (tokenBytes.length <= INITIALIZATION_VECTOR_LENGTH) {
-    throw new Error('Invalid game token.');
-  }
-
-  const initializationVector = tokenBytes.slice(0, INITIALIZATION_VECTOR_LENGTH);
-  const encryptedBytes = tokenBytes.slice(INITIALIZATION_VECTOR_LENGTH);
-  const key = await createEncryptionKey(secret);
-
   try {
+    const tokenBytes = fromBase64Url(token);
+
+    if (tokenBytes.length <= INITIALIZATION_VECTOR_LENGTH) {
+      throw new Error('Invalid game token.');
+    }
+
+    const initializationVector = tokenBytes.slice(0, INITIALIZATION_VECTOR_LENGTH);
+    const encryptedBytes = tokenBytes.slice(INITIALIZATION_VECTOR_LENGTH);
+    const key = await createEncryptionKey(secret);
     const decryptedBytes = await crypto.subtle.decrypt(
       {
         name: 'AES-GCM',

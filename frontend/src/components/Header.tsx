@@ -50,18 +50,22 @@ export const Header: React.FC<HeaderProps> = ({
         </div>
       </div>
       
-      <div className="flex items-center justify-between text-slate-600 text-sm font-medium">
-        <div className="flex items-center gap-4">
+      <div className="flex items-start justify-between gap-4 rounded-lg bg-slate-100 px-4 py-3 text-sm font-medium text-slate-600">
+        <div>
+          <div className="text-xs uppercase tracking-wide text-slate-500">Score</div>
+          <div className="font-mono text-xl text-slate-800">{timer}</div>
+          <div className="text-xs text-slate-500">
+            Best {bestScore === null ? '--' : bestScore}
+          </div>
+        </div>
+        <div className="flex flex-col items-start gap-1 pt-0.5">
           <span>Mistakes: {mistakes}</span>
           <span>Penalty: +{INVALID_MOVE_PENALTY_SECONDS}s</span>
-          <span>{difficulty.charAt(0).toUpperCase() + difficulty.slice(1)}</span>
         </div>
         <div className="flex items-center gap-2">
           <div className="text-right">
-            <div className="font-mono text-base text-slate-800">Score {formatScore(timer)}</div>
-            <div className="text-xs text-slate-500">
-              Best {bestScore === null ? '--:--' : formatScore(bestScore)}
-            </div>
+            <div className="text-xs uppercase tracking-wide text-slate-500">Time</div>
+            <div className="font-mono text-base text-slate-800">{formatScore(timer)}</div>
           </div>
           <button
             onClick={onTogglePause}

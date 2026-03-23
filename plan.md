@@ -8,7 +8,7 @@ Use:
 
 - `frontend/` for the React app
 - `shared/` for pure Sudoku logic and shared types
-- `server/` for an Express REST API on Cloudflare Workers
+- `server/` for a Cloudflare Worker REST API
 - Cloudflare Pages for the frontend
 - No database for the MVP
 
@@ -23,7 +23,7 @@ Use:
     types.ts                # board + API-safe shared types
   server/
     src/
-      index.ts              # Express app entrypoint for Worker
+      index.ts              # Worker entrypoint
       routes/
         health.ts
         games.ts
@@ -37,7 +37,7 @@ Use:
 
 ## MVP Scope
 
-Use Express for the backend.
+Use native Worker APIs for the backend.
 
 Start with only these endpoints:
 
@@ -156,7 +156,7 @@ Put pure logic in `shared/`:
 
 Keep React-only state and components inside `frontend/`.
 
-### 3. Create the Express backend
+### 3. Create the Worker backend
 
 Inside `server/`, add:
 
@@ -168,13 +168,10 @@ Inside `server/`, add:
 
 Recommended backend packages:
 
-- `express`
-- `cors`
 - `zod`
 - `wrangler`
 - `typescript`
 - `tsx`
-- `@types/express`
 
 ### 4. Implement token handling
 
@@ -298,7 +295,7 @@ Then redeploy the frontend.
 ## Important Notes
 
 - keep the MVP stateless
-- use Express on Workers with `nodejs_compat`
+- use native Worker handlers and Web Crypto
 - keep the solution out of the client
 - add a database later only if you need saved sessions or accounts
 
@@ -307,7 +304,7 @@ Then redeploy the frontend.
 1. move the current app into `frontend/`
 2. create `shared/`
 3. create `server/`
-4. add the Express routes
+4. add the Worker routes
 5. add token signing/encryption
 6. connect the frontend to the API
 7. deploy the Worker

@@ -1,4 +1,4 @@
-import { GameStatus } from './types';
+import type { GameStatus } from './types.ts';
 
 export const INVALID_MOVE_PENALTY_SECONDS = 30;
 

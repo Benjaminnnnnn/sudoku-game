@@ -1,4 +1,4 @@
-import { Board, Difficulty } from './types';
+import type { Board, Difficulty } from './types.ts';
 
 export function isValid(board: Board, row: number, col: number, num: number): boolean {
   for (let i = 0; i < 9; i++) {

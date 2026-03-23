@@ -88,9 +88,10 @@ export const SudokuBoard: React.FC<SudokuBoardProps> = ({
         <div className="absolute inset-0 bg-emerald-100/90 backdrop-blur-sm flex items-center justify-center z-10">
           <div className="text-center">
             <span className="text-4xl font-bold text-emerald-600 block mb-2">Solved!</span>
-            <span className="text-emerald-800 font-medium block">Final score: {formatScore(gameState.timer)}</span>
+            <span className="text-emerald-800 font-medium block">Time: {formatScore(gameState.timer)}</span>
+            <span className="text-emerald-800 font-medium block">Final score: {gameState.timer}s</span>
             <span className="text-emerald-700 text-sm">
-              Best: {gameState.bestScores[gameState.difficulty] === null ? '--:--' : formatScore(gameState.bestScores[gameState.difficulty] as number)}
+              Best: {gameState.bestScores[gameState.difficulty] === null ? '--' : `${gameState.bestScores[gameState.difficulty]}s`}
             </span>
           </div>
         </div>
