@@ -46,7 +46,7 @@ export const SudokuCell: React.FC<SudokuCellProps> = ({
   return (
     <button
       type="button"
-      className={cn('aspect-square cursor-pointer focus:outline-none focus-visible:z-10 focus-visible:shadow-[inset_0_0_0_3px_rgba(15,23,42,0.55)]', borderClasses, bgClasses)}
+      className={cn('aspect-square cursor-pointer focus-visible:outline-none focus-visible:z-10 focus-visible:shadow-[inset_0_0_0_3px_rgba(15,23,42,0.55)]', borderClasses, bgClasses)}
       onClick={onClick}
       aria-label={`Row ${row + 1} Column ${col + 1}${value !== 0 ? ` Value ${value}` : ' Empty'}`}
     >

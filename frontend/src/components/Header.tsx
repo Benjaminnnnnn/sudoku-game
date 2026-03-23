@@ -42,21 +42,23 @@ export const Header: React.FC<HeaderProps> = ({
           <label htmlFor="difficulty" className="sr-only">Difficulty</label>
           <select
             id="difficulty"
+            name="difficulty"
             value={difficulty}
             onChange={(e) => onNewGame(e.target.value as Difficulty)}
             disabled={isLoading}
-            className="rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm font-semibold uppercase tracking-[0.12em] text-slate-700 shadow-[0_8px_24px_rgba(15,23,42,0.06)] transition-colors hover:border-slate-300 hover:bg-slate-50"
+            className="rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm font-semibold uppercase tracking-[0.12em] text-slate-700 shadow-[0_8px_24px_rgba(15,23,42,0.06)] transition-colors hover:border-slate-300 hover:bg-slate-50 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600"
           >
             <option value="easy">Easy</option>
             <option value="medium">Medium</option>
             <option value="hard">Hard</option>
           </select>
           <button
+            type="button"
             onClick={() => onNewGame(difficulty)}
             disabled={isLoading}
-            className="rounded-2xl bg-slate-900 px-5 py-3 text-sm font-semibold uppercase tracking-[0.14em] text-white shadow-[0_16px_30px_rgba(15,23,42,0.18)] transition-all duration-200 hover:-translate-y-0.5 hover:bg-slate-800 disabled:translate-y-0 disabled:opacity-60"
+            className="rounded-2xl bg-slate-900 px-5 py-3 text-sm font-semibold uppercase tracking-[0.14em] text-white shadow-[0_16px_30px_rgba(15,23,42,0.18)] transition-[transform,background-color,opacity] duration-200 hover:-translate-y-0.5 hover:bg-slate-800 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-slate-900 disabled:translate-y-0 disabled:opacity-60"
           >
-            {isLoading ? 'Loading...' : 'New Game'}
+            {isLoading ? 'Loading…' : 'New Game'}
           </button>
         </div>
       </div>
@@ -64,7 +66,7 @@ export const Header: React.FC<HeaderProps> = ({
       <div className="grid gap-4 md:grid-cols-[1.2fr_1fr_0.9fr]">
         <div className="rounded-[1.5rem] border border-white/80 bg-[rgba(255,255,255,0.78)] px-4 py-4 shadow-[0_18px_45px_rgba(15,23,42,0.1)] backdrop-blur-sm">
           <div className="text-xs font-semibold uppercase tracking-[0.24em] text-slate-500">Score</div>
-          <div className="mt-2 font-display text-4xl uppercase tracking-[0.08em] text-slate-900">{timer}</div>
+          <div className="mt-2 font-display text-4xl uppercase tracking-[0.08em] tabular-nums text-slate-900">{timer}</div>
           <div className="mt-2 text-xs font-medium uppercase tracking-[0.16em] text-slate-500">
             Best {bestScore === null ? '--' : bestScore}
           </div>
@@ -73,11 +75,11 @@ export const Header: React.FC<HeaderProps> = ({
         <div className="grid grid-cols-2 gap-3">
           <div className="rounded-[1.5rem] border border-white/80 bg-[rgba(255,255,255,0.78)] px-4 py-4 shadow-[0_18px_45px_rgba(15,23,42,0.1)] backdrop-blur-sm">
             <div className="text-[11px] font-semibold uppercase tracking-[0.22em] text-slate-500">Mistakes</div>
-            <div className="mt-2 font-display text-3xl uppercase tracking-[0.06em] text-slate-900">{mistakes}</div>
+            <div className="mt-2 font-display text-3xl uppercase tracking-[0.06em] tabular-nums text-slate-900">{mistakes}</div>
           </div>
           <div className="rounded-[1.5rem] border border-white/80 bg-[rgba(255,255,255,0.78)] px-4 py-4 shadow-[0_18px_45px_rgba(15,23,42,0.1)] backdrop-blur-sm">
             <div className="text-[11px] font-semibold uppercase tracking-[0.22em] text-slate-500">Penalty</div>
-            <div className="mt-2 font-display text-3xl uppercase tracking-[0.06em] text-slate-900">
+            <div className="mt-2 font-display text-3xl uppercase tracking-[0.06em] tabular-nums text-slate-900">
               +{INVALID_MOVE_PENALTY_SECONDS}
             </div>
           </div>
@@ -86,15 +88,16 @@ export const Header: React.FC<HeaderProps> = ({
         <div className="flex items-center justify-between rounded-[1.5rem] border border-white/80 bg-[rgba(255,255,255,0.78)] px-4 py-4 shadow-[0_18px_45px_rgba(15,23,42,0.1)] backdrop-blur-sm">
           <div>
             <div className="text-[11px] font-semibold uppercase tracking-[0.22em] text-slate-500">Time</div>
-            <div className="mt-2 font-mono text-2xl text-slate-900">{formatScore(timer)}</div>
+            <div className="mt-2 font-mono text-2xl tabular-nums text-slate-900">{formatScore(timer)}</div>
           </div>
           <button
+            type="button"
             onClick={onTogglePause}
             disabled={isLoading || status === 'completed'}
-            className="rounded-full border border-slate-200 bg-white p-3 text-slate-500 shadow-[0_10px_24px_rgba(15,23,42,0.08)] transition-colors hover:border-slate-300 hover:bg-slate-50 hover:text-blue-700 disabled:opacity-50"
+            className="rounded-full border border-slate-200 bg-white p-3 text-slate-500 shadow-[0_10px_24px_rgba(15,23,42,0.08)] transition-colors hover:border-slate-300 hover:bg-slate-50 hover:text-blue-700 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600 disabled:opacity-50"
             aria-label={status === 'paused' ? 'Resume game' : 'Pause game'}
           >
-            {status === 'paused' ? <Play size={18} /> : <Pause size={18} />}
+            {status === 'paused' ? <Play size={18} aria-hidden="true" /> : <Pause size={18} aria-hidden="true" />}
           </button>
         </div>
       </div>

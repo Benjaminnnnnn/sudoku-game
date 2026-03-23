@@ -26,6 +26,7 @@ html {
     radial-gradient(circle at top right, rgba(37, 99, 235, 0.18), transparent 24%),
     linear-gradient(180deg, #eef4ff 0%, #f8fafc 38%, #eef2ff 100%);
   min-height: 100%;
+  overflow-x: hidden;
 }
 
 body {
@@ -36,10 +37,17 @@ body {
     linear-gradient(90deg, rgba(19, 35, 63, 0.035) 1px, transparent 1px),
     linear-gradient(rgba(19, 35, 63, 0.035) 1px, transparent 1px);
   background-size: 36px 36px;
+  overflow-x: hidden;
 }
 
 #root {
   min-height: 100vh;
+}
+
+h1,
+h2,
+h3 {
+  text-wrap: balance;
 }
 
 ::selection {
@@ -49,10 +57,42 @@ body {
 button,
 select {
   cursor: pointer;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: rgba(37, 99, 235, 0.16);
 }
 
 button:focus-visible,
 select:focus-visible {
   outline: 2px solid rgba(37, 99, 235, 0.45);
   outline-offset: 2px;
+}
+
+.skip-link {
+  position: absolute;
+  left: 1rem;
+  top: 1rem;
+  z-index: 50;
+  transform: translateY(-200%);
+  border-radius: 9999px;
+  background: #0f172a;
+  color: #fff;
+  padding: 0.75rem 1rem;
+  font-size: 0.875rem;
+  font-weight: 600;
+  transition: transform 150ms ease;
+}
+
+.skip-link:focus-visible {
+  transform: translateY(0);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  ::before,
+  ::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    scroll-behavior: auto !important;
+    transition-duration: 0.01ms !important;
+  }
 }

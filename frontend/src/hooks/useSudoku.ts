@@ -83,7 +83,10 @@ export function useSudoku() {
       setGameState((prev) => ({
         ...prev,
         isLoading: false,
-        errorMessage: error instanceof Error ? error.message : 'Failed to create a new game.',
+        errorMessage:
+          error instanceof Error
+            ? `Unable to start a new game. ${error.message}`
+            : 'Unable to start a new game. Check the connection and try again.',
       }));
     }
   }, [gameState.difficulty]);
@@ -244,7 +247,10 @@ export function useSudoku() {
       setGameState((prev) => ({
         ...prev,
         isLoading: false,
-        errorMessage: error instanceof Error ? error.message : 'Failed to validate move.',
+        errorMessage:
+          error instanceof Error
+            ? `Unable to validate that move. ${error.message}`
+            : 'Unable to validate that move. Try again.',
       }));
     }
   }, [gameState]);
