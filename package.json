@@ -9,6 +9,7 @@
     "dev:server": "npm run dev --prefix server"
   },
   "devDependencies": {
+    "@types/react": "^19.2.14",
     "concurrently": "^9.2.1"
   }
 }

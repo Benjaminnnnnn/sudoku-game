@@ -1,4 +1,5 @@
 import type { PuzzlePayload } from '../../../shared/types.ts';
+import { InvalidGameTokenError } from './errors.ts';
 
 const encoder = new TextEncoder();
 const decoder = new TextDecoder();
@@ -61,7 +62,7 @@ export async function decodeGameToken(token: string, secret: string): Promise<Pu
     const tokenBytes = fromBase64Url(token);
 
     if (tokenBytes.length <= INITIALIZATION_VECTOR_LENGTH) {
-      throw new Error('Invalid game token.');
+      throw new InvalidGameTokenError();
     }
 
     const initializationVector = tokenBytes.slice(0, INITIALIZATION_VECTOR_LENGTH);
@@ -78,6 +79,6 @@ export async function decodeGameToken(token: string, secret: string): Promise<Pu
 
     return JSON.parse(decoder.decode(decryptedBytes)) as PuzzlePayload;
   } catch {
-    throw new Error('Invalid game token.');
+    throw new InvalidGameTokenError();
   }
 }
