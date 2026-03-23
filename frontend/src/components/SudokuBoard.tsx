@@ -40,92 +40,102 @@ export const SudokuBoard: React.FC = () => {
   const selectedValue = selectedCell ? board[selectedCell.row][selectedCell.col].value : 0;
 
   return (
-    <section aria-labelledby="board-title" className="rounded-[2rem] border border-white/80 bg-[rgba(255,255,255,0.78)] p-4 shadow-[0_24px_60px_rgba(15,23,42,0.12)] backdrop-blur-sm sm:p-5">
-      <div className="mb-4 flex items-center justify-between gap-4">
+    <section aria-labelledby="board-title" className="flex min-h-0 flex-col rounded-[2rem] border border-white/80 bg-[rgba(255,255,255,0.78)] p-3 shadow-[0_24px_60px_rgba(15,23,42,0.12)] backdrop-blur-sm sm:p-4">
+      <div className="mb-3 flex flex-wrap items-center justify-between gap-3">
         <div>
           <div className="text-xs font-semibold uppercase tracking-[0.22em] text-slate-500">Grid</div>
-          <h2 id="board-title" className="mt-1 font-display text-2xl uppercase tracking-[0.08em] text-slate-900">Board Matrix</h2>
+          <h2 id="board-title" className="mt-1 font-display text-xl uppercase tracking-[0.08em] text-slate-900 sm:text-2xl">Board Matrix</h2>
         </div>
-        <div className="rounded-full border border-slate-200 bg-white px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-600">
-          {status === 'paused' ? 'Paused' : status === 'completed' ? 'Solved' : 'Active'}
-        </div>
-      </div>
-
-      <div className="relative mx-auto aspect-square w-full max-w-[42rem] overflow-hidden rounded-[1.6rem] border border-[#b9caef] bg-[#d7e5ff] p-3 shadow-[inset_0_1px_0_rgba(255,255,255,0.75)] sm:p-4">
-        <div
-          role="group"
-          aria-label="Sudoku board"
-          className="grid h-full w-full grid-cols-9 grid-rows-9 overflow-hidden rounded-[1rem] border-2 border-slate-900 bg-slate-900"
-        >
-          {board.map((row, r) =>
-            row.map((cell, c) => {
-              const isSelected = selectedCell?.row === r && selectedCell?.col === c;
-              const isHighlighted =
-                selectedCell !== null &&
-                !isSelected &&
-                (selectedCell.row === r ||
-                  selectedCell.col === c ||
-                  (Math.floor(selectedCell.row / 3) === Math.floor(r / 3) &&
-                    Math.floor(selectedCell.col / 3) === Math.floor(c / 3)));
-              const isMatchingValue = selectedValue !== 0 && cell.value === selectedValue;
-
-              return (
-                <SudokuCell
-                  key={`${r}-${c}`}
-                  cell={cell}
-                  isSelected={isSelected}
-                  isHighlighted={isHighlighted}
-                  isMatchingValue={isMatchingValue}
-                  onClick={() => actions.selectCell(r, c)}
-                />
-              );
-            })
-          )}
-        </div>
-
-        {status === 'paused' && (
-          <div className="absolute inset-0 z-10 flex items-center justify-center bg-white/70 backdrop-blur-sm">
-            <span className="font-display text-4xl uppercase tracking-[0.08em] text-slate-900">Paused</span>
-          </div>
-        )}
-        {gameState.isLoading && board.length > 0 && (
-          <div
-            role="status"
-            aria-live="polite"
-            className="absolute inset-0 z-10 flex items-center justify-center bg-white/60 backdrop-blur-sm"
-          >
-            <span className="rounded-full border border-slate-200 bg-white px-5 py-2 text-sm font-semibold uppercase tracking-[0.18em] text-slate-700 shadow-[0_12px_24px_rgba(15,23,42,0.08)]">
-              Working…
+        <div className="flex flex-wrap items-center gap-2">
+          {selectedValue !== 0 ? (
+            <span className="rounded-full border border-blue-200 bg-blue-50 px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.18em] text-blue-700 sm:text-[11px]">
+              Tracking {selectedValue}
+            </span>
+          ) : null}
+          <div className="rounded-full border border-slate-200 bg-white px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.18em] text-slate-600 sm:text-[11px]">
+            <span data-testid="board-status">
+              {status === 'paused' ? 'Paused' : status === 'completed' ? 'Solved' : 'Active'}
             </span>
           </div>
-        )}
-        {status === 'completed' && (
-          <div
-            role="status"
-            aria-live="polite"
-            className="absolute inset-0 z-10 flex items-center justify-center bg-emerald-100/75 backdrop-blur-sm"
-          >
-            <div className="rounded-[1.6rem] border border-emerald-200 bg-white/90 px-8 py-7 text-center shadow-[0_24px_60px_rgba(15,118,110,0.15)]">
-              <span className="mb-2 block font-display text-4xl uppercase tracking-[0.08em] text-emerald-700">Solved!</span>
-              <span className="block text-sm font-semibold uppercase tracking-[0.18em] text-emerald-700">Time</span>
-              <span className="block font-mono text-xl tabular-nums text-emerald-950">{formatScore(gameState.timer)}</span>
-              <span className="mt-3 block text-sm font-semibold uppercase tracking-[0.18em] text-emerald-700">Final Score</span>
-              <span className="block font-display text-3xl uppercase tracking-[0.06em] tabular-nums text-emerald-900">{gameState.timer}</span>
-              <span className="mt-2 block text-xs font-medium uppercase tracking-[0.16em] text-emerald-700">
-                Best {gameState.bestScores[gameState.difficulty] === null ? '--' : gameState.bestScores[gameState.difficulty]}
-              </span>
-            </div>
-          </div>
-        )}
+        </div>
       </div>
 
-      <div className="mt-4 flex flex-wrap items-center gap-x-4 gap-y-2 text-xs font-medium uppercase tracking-[0.14em] text-slate-500">
-        <span>Row, column, and box highlights follow your selection</span>
-        {selectedValue !== 0 ? (
-          <span className="rounded-full border border-slate-200 bg-white px-3 py-1 text-slate-700">
-            Tracking {selectedValue}
-          </span>
-        ) : null}
+      <div className="flex min-h-0 flex-1 items-center justify-center">
+        <div className="relative mx-auto aspect-square w-full max-w-[min(42rem,calc(100vw-2rem),calc(100dvh-23rem))] overflow-hidden rounded-[1.4rem] border border-[#b9caef] bg-[#d7e5ff] p-2.5 shadow-[inset_0_1px_0_rgba(255,255,255,0.75)] sm:max-w-[min(42rem,calc(100vw-3rem),calc(100dvh-21rem))] sm:p-3 md:max-w-[min(42rem,calc(100vw-21rem),calc(100dvh-13rem))] lg:max-w-[min(42rem,calc(100vw-23rem),calc(100dvh-12rem))] xl:max-w-[min(42rem,calc(100vw-26rem),calc(100dvh-12rem))]">
+          <div
+            role="group"
+            aria-label="Sudoku board"
+            className="grid h-full w-full grid-cols-9 grid-rows-9 overflow-hidden rounded-[1rem] border-2 border-slate-900 bg-slate-900"
+          >
+            {board.map((row, r) =>
+              row.map((cell, c) => {
+                const isSelected = selectedCell?.row === r && selectedCell?.col === c;
+                const isHighlighted =
+                  selectedCell !== null &&
+                  !isSelected &&
+                  (selectedCell.row === r ||
+                    selectedCell.col === c ||
+                    (Math.floor(selectedCell.row / 3) === Math.floor(r / 3) &&
+                      Math.floor(selectedCell.col / 3) === Math.floor(c / 3)));
+                const isMatchingValue = selectedValue !== 0 && cell.value === selectedValue;
+
+                return (
+                  <SudokuCell
+                    key={`${r}-${c}`}
+                    cell={cell}
+                    isSelected={isSelected}
+                    isHighlighted={isHighlighted}
+                    isMatchingValue={isMatchingValue}
+                    onClick={() => actions.selectCell(r, c)}
+                  />
+                );
+              })
+            )}
+          </div>
+
+          {status === 'paused' && (
+            <div
+              data-testid="paused-overlay"
+              className="absolute inset-0 z-10 flex items-center justify-center bg-white/70 backdrop-blur-sm"
+            >
+              <span className="font-display text-4xl uppercase tracking-[0.08em] text-slate-900">Paused</span>
+            </div>
+          )}
+          {gameState.isLoading && board.length > 0 && (
+            <div
+              role="status"
+              aria-live="polite"
+              className="absolute inset-0 z-10 flex items-center justify-center bg-white/60 backdrop-blur-sm"
+            >
+              <span className="rounded-full border border-slate-200 bg-white px-5 py-2 text-sm font-semibold uppercase tracking-[0.18em] text-slate-700 shadow-[0_12px_24px_rgba(15,23,42,0.08)]">
+                Working…
+              </span>
+            </div>
+          )}
+          {status === 'completed' && (
+            <div
+              data-testid="solved-overlay"
+              role="status"
+              aria-live="polite"
+              className="absolute inset-0 z-10 flex items-center justify-center bg-emerald-100/75 backdrop-blur-sm"
+            >
+              <div className="rounded-[1.6rem] border border-emerald-200 bg-white/90 px-8 py-7 text-center shadow-[0_24px_60px_rgba(15,118,110,0.15)]">
+                <span className="mb-2 block font-display text-4xl uppercase tracking-[0.08em] text-emerald-700">Solved!</span>
+                <span className="block text-sm font-semibold uppercase tracking-[0.18em] text-emerald-700">Time</span>
+                <span className="block font-mono text-xl tabular-nums text-emerald-950">{formatScore(gameState.timer)}</span>
+                <span className="mt-3 block text-sm font-semibold uppercase tracking-[0.18em] text-emerald-700">Final Score</span>
+                <span className="block font-display text-3xl uppercase tracking-[0.06em] tabular-nums text-emerald-900">{gameState.timer}</span>
+                <span className="mt-2 block text-xs font-medium uppercase tracking-[0.16em] text-emerald-700">
+                  Best {gameState.bestScores[gameState.difficulty] === null ? '--' : gameState.bestScores[gameState.difficulty]}
+                </span>
+              </div>
+            </div>
+          )}
+        </div>
+      </div>
+
+      <div className="mt-3 text-[10px] font-medium uppercase tracking-[0.14em] text-slate-500 sm:text-xs">
+        Selection highlights matching row, column, and box.
       </div>
     </section>
   );

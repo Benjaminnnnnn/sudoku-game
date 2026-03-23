@@ -38,7 +38,7 @@ export const SudokuCell: React.FC<SudokuCellProps> = ({
   );
 
   const textClasses = cn(
-    'text-2xl sm:text-3xl font-semibold flex items-center justify-center h-full w-full select-none transition-colors duration-150',
+    'flex h-full w-full select-none items-center justify-center text-[clamp(1.1rem,2.7vw,1.85rem)] font-semibold transition-colors duration-150 sm:text-[clamp(1.35rem,2.6vw,2.15rem)]',
     isFixed ? 'text-slate-900' : 'text-blue-700',
     isError && 'text-red-600'
   );
@@ -46,6 +46,7 @@ export const SudokuCell: React.FC<SudokuCellProps> = ({
   return (
     <button
       type="button"
+      data-testid={`cell-${row}-${col}`}
       className={cn('aspect-square cursor-pointer focus-visible:outline-none focus-visible:z-10 focus-visible:shadow-[inset_0_0_0_3px_rgba(15,23,42,0.55)]', borderClasses, bgClasses)}
       onClick={onClick}
       aria-label={`Row ${row + 1} Column ${col + 1}${value !== 0 ? ` Value ${value}` : ' Empty'}`}
@@ -58,7 +59,7 @@ export const SudokuCell: React.FC<SudokuCellProps> = ({
             {[1, 2, 3, 4, 5, 6, 7, 8, 9].map((n) => (
               <div
                 key={n}
-                className="flex items-center justify-center text-[10px] font-medium leading-none text-slate-400 sm:text-xs"
+                className="flex items-center justify-center text-[9px] font-medium leading-none text-slate-400 sm:text-[10px]"
               >
                 {notes.has(n) ? n : ''}
               </div>
