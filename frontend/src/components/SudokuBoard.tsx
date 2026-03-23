@@ -1,22 +1,11 @@
 import React, { useEffect } from 'react';
 import { canEditBoard } from '../lib/gameStatus';
 import { formatScore } from '../lib/score';
-import { GameState } from '../types';
 import { SudokuCell } from './SudokuCell';
+import { useSudokuGame } from './GameContext';
 
-interface SudokuBoardProps {
-  gameState: GameState;
-  onSelectCell: (row: number, col: number) => void;
-  onMoveSelection: (dRow: number, dCol: number) => void;
-  onSetValue: (val: number) => void;
-}
-
-export const SudokuBoard: React.FC<SudokuBoardProps> = ({
-  gameState,
-  onSelectCell,
-  onMoveSelection,
-  onSetValue,
-}) => {
+export const SudokuBoard: React.FC = () => {
+  const { state: gameState, actions } = useSudokuGame();
   const { board, selectedCell, status } = gameState;
 
   useEffect(() => {
@@ -28,23 +17,23 @@ export const SudokuBoard: React.FC<SudokuBoardProps> = ({
       }
 
       if (e.key >= '1' && e.key <= '9') {
-        onSetValue(parseInt(e.key, 10));
+        void actions.setCellValue(parseInt(e.key, 10));
       } else if (e.key === 'Backspace' || e.key === 'Delete' || e.key === '0') {
-        onSetValue(0);
+        void actions.setCellValue(0);
       } else if (e.key === 'ArrowUp') {
-        onMoveSelection(-1, 0);
+        actions.moveSelection(-1, 0);
       } else if (e.key === 'ArrowDown') {
-        onMoveSelection(1, 0);
+        actions.moveSelection(1, 0);
       } else if (e.key === 'ArrowLeft') {
-        onMoveSelection(0, -1);
+        actions.moveSelection(0, -1);
       } else if (e.key === 'ArrowRight') {
-        onMoveSelection(0, 1);
+        actions.moveSelection(0, 1);
       }
     };
 
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [status, onSetValue, onMoveSelection]);
+  }, [actions, status]);
 
   if (board.length === 0) return null;
 
@@ -87,7 +76,7 @@ export const SudokuBoard: React.FC<SudokuBoardProps> = ({
                   isSelected={isSelected}
                   isHighlighted={isHighlighted}
                   isMatchingValue={isMatchingValue}
-                  onClick={() => onSelectCell(r, c)}
+                  onClick={() => actions.selectCell(r, c)}
                 />
               );
             })

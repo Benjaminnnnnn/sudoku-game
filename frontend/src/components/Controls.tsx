@@ -1,24 +1,12 @@
 import React from 'react';
 import { Eraser, Pencil, Undo2, RotateCcw } from 'lucide-react';
 import { cn } from '../lib/utils';
+import { useSudokuGame } from './GameContext';
 
-interface ControlsProps {
-  notesMode: boolean;
-  onToggleNotes: () => void;
-  onSetValue: (val: number) => void;
-  onUndo: () => void;
-  onReset: () => void;
-  disabled: boolean;
-}
-
-export const Controls: React.FC<ControlsProps> = ({
-  notesMode,
-  onToggleNotes,
-  onSetValue,
-  onUndo,
-  onReset,
-  disabled,
-}) => {
+export const Controls: React.FC = () => {
+  const { state, actions, meta } = useSudokuGame();
+  const { notesMode } = state;
+  const { controlsDisabled } = meta;
   const controlButtonClass =
     'flex min-h-[6.5rem] flex-col items-center justify-center gap-2 rounded-[1.35rem] border border-slate-200 bg-white text-slate-600 shadow-[0_10px_24px_rgba(15,23,42,0.06)] transition-[transform,border-color,color,background-color,opacity] duration-200 hover:-translate-y-0.5 hover:border-slate-300 hover:text-blue-700 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600 disabled:translate-y-0 disabled:opacity-50 disabled:hover:text-slate-600';
 
@@ -27,8 +15,8 @@ export const Controls: React.FC<ControlsProps> = ({
       <div className="grid grid-cols-2 gap-3">
         <button
           type="button"
-          onClick={onUndo}
-          disabled={disabled}
+          onClick={actions.undo}
+          disabled={controlsDisabled}
           className={controlButtonClass}
         >
           <div className="flex h-11 w-11 items-center justify-center rounded-full bg-slate-100">
@@ -38,8 +26,10 @@ export const Controls: React.FC<ControlsProps> = ({
         </button>
         <button
           type="button"
-          onClick={() => onSetValue(0)}
-          disabled={disabled}
+          onClick={() => {
+            void actions.setCellValue(0);
+          }}
+          disabled={controlsDisabled}
           className={controlButtonClass}
         >
           <div className="flex h-11 w-11 items-center justify-center rounded-full bg-slate-100">
@@ -49,8 +39,8 @@ export const Controls: React.FC<ControlsProps> = ({
         </button>
         <button
           type="button"
-          onClick={onToggleNotes}
-          disabled={disabled}
+          onClick={actions.toggleNotesMode}
+          disabled={controlsDisabled}
           aria-pressed={notesMode}
           className={cn(
             'flex min-h-[6.5rem] flex-col items-center justify-center gap-2 rounded-[1.35rem] border shadow-[0_10px_24px_rgba(15,23,42,0.06)] transition-[transform,border-color,color,background-color,opacity] duration-200 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600 disabled:opacity-50',
@@ -69,8 +59,8 @@ export const Controls: React.FC<ControlsProps> = ({
         </button>
         <button
           type="button"
-          onClick={onReset}
-          disabled={disabled}
+          onClick={actions.resetPuzzle}
+          disabled={controlsDisabled}
           className={controlButtonClass}
         >
           <div className="flex h-11 w-11 items-center justify-center rounded-full bg-slate-100">
@@ -87,8 +77,10 @@ export const Controls: React.FC<ControlsProps> = ({
           <button
             type="button"
             key={num}
-            onClick={() => onSetValue(num)}
-            disabled={disabled}
+            onClick={() => {
+              void actions.setCellValue(num);
+            }}
+            disabled={controlsDisabled}
             aria-label={`Place ${num}`}
             className="aspect-square rounded-[1.25rem] border border-slate-200 bg-white text-3xl font-semibold text-slate-900 shadow-[0_10px_24px_rgba(15,23,42,0.06)] transition-[transform,border-color,color,background-color,opacity] duration-150 hover:-translate-y-0.5 hover:border-blue-200 hover:bg-blue-50 hover:text-blue-700 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600 active:bg-blue-100 disabled:translate-y-0 disabled:opacity-50"
           >

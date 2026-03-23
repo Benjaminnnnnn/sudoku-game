@@ -1,23 +1,55 @@
 import React from 'react';
-import { useSudoku } from '../hooks/useSudoku';
-import { canEditBoard } from '../lib/gameStatus';
 import { Header } from './Header';
 import { SudokuBoard } from './SudokuBoard';
 import { Controls } from './Controls';
+import { SudokuGameProvider, useSudokuGame } from './GameContext';
 
-export const Game: React.FC = () => {
-  const {
-    gameState,
-    startNewGame,
-    selectCell,
-    moveSelection,
-    setCellValue,
-    toggleNotesMode,
-    undo,
-    resetPuzzle,
-    togglePause,
-  } = useSudoku();
+const GameStatusBanner: React.FC = () => {
+  const { state } = useSudokuGame();
 
+  if (!state.errorMessage) {
+    return null;
+  }
+
+  return (
+    <div
+      role="alert"
+      aria-live="polite"
+      className="rounded-2xl border border-rose-200 bg-rose-50/90 px-4 py-3 text-sm break-words text-rose-700 shadow-[0_10px_24px_rgba(220,38,38,0.08)]"
+    >
+      {state.errorMessage}
+    </div>
+  );
+};
+
+const GameControlsPanel: React.FC = () => {
+  const { state } = useSudokuGame();
+
+  return (
+    <section
+      aria-labelledby="controls-title"
+      className="rounded-[1.75rem] border border-white/80 bg-[rgba(255,255,255,0.78)] p-4 shadow-[0_24px_60px_rgba(15,23,42,0.12)] backdrop-blur-sm sm:p-5"
+    >
+      <div className="mb-4 flex items-start justify-between gap-4">
+        <div>
+          <div className="text-xs font-semibold uppercase tracking-[0.22em] text-slate-500">
+            Input Deck
+          </div>
+          <h2 id="controls-title" className="mt-1 font-display text-2xl uppercase tracking-[0.08em] text-slate-900">
+            Play Board
+          </h2>
+        </div>
+        <div className="rounded-full border border-slate-200 bg-white px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-600">
+          {state.notesMode ? 'Notes Mode' : 'Direct Entry'}
+        </div>
+      </div>
+
+      <Controls />
+    </section>
+  );
+};
+
+const GameFrame: React.FC = () => {
   return (
     <>
       <a href="#main-content" className="skip-link">
@@ -42,65 +74,23 @@ export const Game: React.FC = () => {
             </div>
           </section>
 
-          <Header
-            difficulty={gameState.difficulty}
-            timer={gameState.timer}
-            mistakes={gameState.mistakes}
-            status={gameState.status}
-            onNewGame={startNewGame}
-            onTogglePause={togglePause}
-            isLoading={gameState.isLoading}
-            bestScore={gameState.bestScores[gameState.difficulty]}
-          />
-
-          {gameState.errorMessage ? (
-            <div
-              role="alert"
-              aria-live="polite"
-              className="rounded-2xl border border-rose-200 bg-rose-50/90 px-4 py-3 text-sm break-words text-rose-700 shadow-[0_10px_24px_rgba(220,38,38,0.08)]"
-            >
-              {gameState.errorMessage}
-            </div>
-          ) : null}
+          <Header />
+          <GameStatusBanner />
 
           <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_20rem] lg:items-start">
-            <SudokuBoard
-              gameState={gameState}
-              onSelectCell={selectCell}
-              onMoveSelection={moveSelection}
-              onSetValue={setCellValue}
-            />
-
-            <section
-              aria-labelledby="controls-title"
-              className="rounded-[1.75rem] border border-white/80 bg-[rgba(255,255,255,0.78)] p-4 shadow-[0_24px_60px_rgba(15,23,42,0.12)] backdrop-blur-sm sm:p-5"
-            >
-              <div className="mb-4 flex items-start justify-between gap-4">
-                <div>
-                  <div className="text-xs font-semibold uppercase tracking-[0.22em] text-slate-500">
-                    Input Deck
-                  </div>
-                  <h2 id="controls-title" className="mt-1 font-display text-2xl uppercase tracking-[0.08em] text-slate-900">
-                    Play Board
-                  </h2>
-                </div>
-                <div className="rounded-full border border-slate-200 bg-white px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-600">
-                  {gameState.notesMode ? 'Notes Mode' : 'Direct Entry'}
-                </div>
-              </div>
-
-              <Controls
-                notesMode={gameState.notesMode}
-                onToggleNotes={toggleNotesMode}
-                onSetValue={setCellValue}
-                onUndo={undo}
-                onReset={resetPuzzle}
-                disabled={gameState.isLoading || gameState.board.length === 0 || !canEditBoard(gameState.status)}
-              />
-            </section>
+            <SudokuBoard />
+            <GameControlsPanel />
           </div>
         </div>
       </main>
     </>
+  );
+};
+
+export const Game: React.FC = () => {
+  return (
+    <SudokuGameProvider>
+      <GameFrame />
+    </SudokuGameProvider>
   );
 };
