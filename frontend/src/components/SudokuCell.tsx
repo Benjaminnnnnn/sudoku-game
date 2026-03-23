@@ -20,43 +20,45 @@ export const SudokuCell: React.FC<SudokuCellProps> = ({
   const { value, isFixed, isError, notes, row, col } = cell;
 
   const borderClasses = cn(
-    'border-slate-200',
-    col % 3 === 2 && col !== 8 ? 'border-r-slate-800 border-r-2' : 'border-r',
-    row % 3 === 2 && row !== 8 ? 'border-b-slate-800 border-b-2' : 'border-b',
-    col === 0 ? 'border-l-slate-800 border-l-2' : '',
-    row === 0 ? 'border-t-slate-800 border-t-2' : '',
-    col === 8 ? 'border-r-slate-800 border-r-2' : '',
-    row === 8 ? 'border-b-slate-800 border-b-2' : ''
+    'border-[#c7d6f5]',
+    col % 3 === 2 && col !== 8 ? 'border-r-slate-900 border-r-[3px]' : 'border-r',
+    row % 3 === 2 && row !== 8 ? 'border-b-slate-900 border-b-[3px]' : 'border-b',
+    col === 0 ? 'border-l-slate-900 border-l-[3px]' : '',
+    row === 0 ? 'border-t-slate-900 border-t-[3px]' : '',
+    col === 8 ? 'border-r-slate-900 border-r-[3px]' : '',
+    row === 8 ? 'border-b-slate-900 border-b-[3px]' : ''
   );
 
   const bgClasses = cn(
     'bg-white transition-colors duration-150',
-    isSelected && 'bg-indigo-200',
-    !isSelected && isHighlighted && 'bg-indigo-50',
-    !isSelected && isMatchingValue && value !== 0 && 'bg-indigo-100',
-    isError && 'bg-red-100'
+    isSelected && 'bg-[#8fb5ff]',
+    !isSelected && isHighlighted && 'bg-[#edf3ff]',
+    !isSelected && isMatchingValue && value !== 0 && 'bg-[#dce8ff]',
+    isError && 'bg-[#ffe0e0]'
   );
 
   const textClasses = cn(
-    'text-2xl sm:text-3xl font-medium flex items-center justify-center h-full w-full cursor-pointer select-none',
-    isFixed ? 'text-slate-800' : 'text-indigo-600',
+    'text-2xl sm:text-3xl font-semibold flex items-center justify-center h-full w-full select-none transition-colors duration-150',
+    isFixed ? 'text-slate-900' : 'text-blue-700',
     isError && 'text-red-600'
   );
 
   return (
-    <div
-      className={cn('aspect-square', borderClasses, bgClasses)}
+    <button
+      type="button"
+      className={cn('aspect-square cursor-pointer focus:outline-none focus-visible:z-10 focus-visible:shadow-[inset_0_0_0_3px_rgba(15,23,42,0.55)]', borderClasses, bgClasses)}
       onClick={onClick}
+      aria-label={`Row ${row + 1} Column ${col + 1}${value !== 0 ? ` Value ${value}` : ' Empty'}`}
     >
       <div className={textClasses}>
         {value !== 0 ? (
           value
         ) : (
-          <div className="grid grid-cols-3 grid-rows-3 w-full h-full p-0.5">
+          <div className="grid h-full w-full grid-cols-3 grid-rows-3 p-1">
             {[1, 2, 3, 4, 5, 6, 7, 8, 9].map((n) => (
               <div
                 key={n}
-                className="flex items-center justify-center text-[10px] sm:text-xs text-slate-400 font-normal leading-none"
+                className="flex items-center justify-center text-[10px] font-medium leading-none text-slate-400 sm:text-xs"
               >
                 {notes.has(n) ? n : ''}
               </div>
@@ -64,6 +66,6 @@ export const SudokuCell: React.FC<SudokuCellProps> = ({
           </div>
         )}
       </div>
-    </div>
+    </button>
   );
 };

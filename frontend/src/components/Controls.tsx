@@ -20,67 +20,72 @@ export const Controls: React.FC<ControlsProps> = ({
   disabled,
 }) => {
   return (
-    <div className="w-full max-w-md mx-auto mt-6 flex flex-col gap-4">
-      <div className="flex justify-between px-2">
+    <div className="flex w-full flex-col gap-5">
+      <div className="grid grid-cols-2 gap-3">
         <button
           onClick={onUndo}
           disabled={disabled}
-          className="flex flex-col items-center gap-1 text-slate-600 hover:text-indigo-600 disabled:opacity-50 disabled:hover:text-slate-600 transition-colors"
+          className="flex min-h-[6.5rem] flex-col items-center justify-center gap-2 rounded-[1.35rem] border border-slate-200 bg-white text-slate-600 shadow-[0_10px_24px_rgba(15,23,42,0.06)] transition-all duration-200 hover:-translate-y-0.5 hover:border-slate-300 hover:text-blue-700 disabled:translate-y-0 disabled:opacity-50 disabled:hover:text-slate-600"
         >
-          <div className="w-12 h-12 rounded-full bg-slate-100 flex items-center justify-center">
+          <div className="flex h-11 w-11 items-center justify-center rounded-full bg-slate-100">
             <Undo2 size={24} />
           </div>
-          <span className="text-xs font-medium">Undo</span>
+          <span className="text-xs font-semibold uppercase tracking-[0.14em]">Undo</span>
         </button>
         <button
           onClick={() => onSetValue(0)}
           disabled={disabled}
-          className="flex flex-col items-center gap-1 text-slate-600 hover:text-indigo-600 disabled:opacity-50 disabled:hover:text-slate-600 transition-colors"
+          className="flex min-h-[6.5rem] flex-col items-center justify-center gap-2 rounded-[1.35rem] border border-slate-200 bg-white text-slate-600 shadow-[0_10px_24px_rgba(15,23,42,0.06)] transition-all duration-200 hover:-translate-y-0.5 hover:border-slate-300 hover:text-blue-700 disabled:translate-y-0 disabled:opacity-50 disabled:hover:text-slate-600"
         >
-          <div className="w-12 h-12 rounded-full bg-slate-100 flex items-center justify-center">
+          <div className="flex h-11 w-11 items-center justify-center rounded-full bg-slate-100">
             <Eraser size={24} />
           </div>
-          <span className="text-xs font-medium">Erase</span>
+          <span className="text-xs font-semibold uppercase tracking-[0.14em]">Erase</span>
         </button>
         <button
           onClick={onToggleNotes}
           disabled={disabled}
           className={cn(
-            "flex flex-col items-center gap-1 transition-colors disabled:opacity-50",
-            notesMode ? "text-indigo-600" : "text-slate-600 hover:text-indigo-600"
+            "flex min-h-[6.5rem] flex-col items-center justify-center gap-2 rounded-[1.35rem] border shadow-[0_10px_24px_rgba(15,23,42,0.06)] transition-all duration-200 disabled:opacity-50",
+            notesMode
+              ? "border-blue-200 bg-blue-50 text-blue-700"
+              : "border-slate-200 bg-white text-slate-600 hover:-translate-y-0.5 hover:border-slate-300 hover:text-blue-700"
           )}
         >
           <div className={cn(
-            "w-12 h-12 rounded-full flex items-center justify-center transition-colors",
-            notesMode ? "bg-indigo-100" : "bg-slate-100"
+            "flex h-11 w-11 items-center justify-center rounded-full transition-colors",
+            notesMode ? "bg-blue-100" : "bg-slate-100"
           )}>
             <Pencil size={24} />
           </div>
-          <span className="text-xs font-medium">Notes {notesMode ? 'On' : 'Off'}</span>
+          <span className="text-xs font-semibold uppercase tracking-[0.14em]">Notes {notesMode ? 'On' : 'Off'}</span>
         </button>
         <button
           onClick={onReset}
           disabled={disabled}
-          className="flex flex-col items-center gap-1 text-slate-600 hover:text-indigo-600 disabled:opacity-50 disabled:hover:text-slate-600 transition-colors"
+          className="flex min-h-[6.5rem] flex-col items-center justify-center gap-2 rounded-[1.35rem] border border-slate-200 bg-white text-slate-600 shadow-[0_10px_24px_rgba(15,23,42,0.06)] transition-all duration-200 hover:-translate-y-0.5 hover:border-slate-300 hover:text-blue-700 disabled:translate-y-0 disabled:opacity-50 disabled:hover:text-slate-600"
         >
-          <div className="w-12 h-12 rounded-full bg-slate-100 flex items-center justify-center">
+          <div className="flex h-11 w-11 items-center justify-center rounded-full bg-slate-100">
             <RotateCcw size={24} />
           </div>
-          <span className="text-xs font-medium">Reset</span>
+          <span className="text-xs font-semibold uppercase tracking-[0.14em]">Reset</span>
         </button>
       </div>
 
-      <div className="grid grid-cols-9 gap-1 sm:gap-2">
+      <div>
+        <div className="mb-3 text-xs font-semibold uppercase tracking-[0.2em] text-slate-500">Number Pad</div>
+        <div className="grid grid-cols-3 gap-3">
         {[1, 2, 3, 4, 5, 6, 7, 8, 9].map((num) => (
           <button
             key={num}
             onClick={() => onSetValue(num)}
             disabled={disabled}
-            className="aspect-square rounded-lg bg-slate-100 text-slate-800 text-2xl font-medium hover:bg-indigo-100 hover:text-indigo-700 active:bg-indigo-200 transition-colors disabled:opacity-50"
+            className="aspect-square rounded-[1.25rem] border border-slate-200 bg-white text-3xl font-semibold text-slate-900 shadow-[0_10px_24px_rgba(15,23,42,0.06)] transition-all duration-150 hover:-translate-y-0.5 hover:border-blue-200 hover:bg-blue-50 hover:text-blue-700 active:bg-blue-100 disabled:translate-y-0 disabled:opacity-50"
           >
             {num}
           </button>
         ))}
+        </div>
       </div>
     </div>
   );
