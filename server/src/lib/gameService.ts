@@ -1,4 +1,4 @@
-import * as sudoku from '../../../shared/sudoku.ts';
+import { generateSudoku } from '../../../shared/sudoku.ts';
 import type {
   CheckBoardRequest,
   CheckBoardResponse,
@@ -9,11 +9,6 @@ import type {
   ValidateMoveResponse,
 } from '../../../shared/types.ts';
 import { decodeGameToken, encodeGameToken } from './token.ts';
-
-const sudokuModule = sudoku as typeof import('../../../shared/sudoku.ts') & {
-  default?: typeof import('../../../shared/sudoku.ts');
-};
-const { generateSudoku } = sudokuModule.default ?? sudokuModule;
 
 export async function createGame(
   request: CreateGameRequest,
