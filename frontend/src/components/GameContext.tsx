@@ -1,4 +1,4 @@
-import { ReactNode, createContext, use } from 'react';
+import { ReactNode, createContext, use, useMemo } from 'react';
 import { canEditBoard } from '../lib/gameStatus';
 import { useSudoku } from '../hooks/useSudoku';
 import { Difficulty, GameState } from '../types';
@@ -41,7 +41,8 @@ export function SudokuGameProvider({ children }: { children: ReactNode }) {
     togglePause,
   } = useSudoku();
 
-  const contextValue: SudokuGameContextValue = {
+  const canEdit = canEditBoard(gameState.status);
+  const contextValue = useMemo<SudokuGameContextValue>(() => ({
     state: gameState,
     actions: {
       startNewGame,
@@ -54,11 +55,22 @@ export function SudokuGameProvider({ children }: { children: ReactNode }) {
       togglePause,
     },
     meta: {
-      canEdit: canEditBoard(gameState.status),
-      controlsDisabled: gameState.isLoading || gameState.board.length === 0 || !canEditBoard(gameState.status),
+      canEdit,
+      controlsDisabled: gameState.isLoading || gameState.board.length === 0 || !canEdit,
       bestScore: gameState.bestScores[gameState.difficulty],
     },
-  };
+  }), [
+    canEdit,
+    gameState,
+    moveSelection,
+    resetPuzzle,
+    selectCell,
+    setCellValue,
+    startNewGame,
+    toggleNotesMode,
+    togglePause,
+    undo,
+  ]);
 
   return <SudokuGameContext value={contextValue}>{children}</SudokuGameContext>;
 }

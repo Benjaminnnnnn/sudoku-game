@@ -1,93 +1,45 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useCallback, useEffect, useState } from 'react';
+import type { CheckBoardResponse } from '../../../shared/types';
 import { checkBoard, createGame, validateMove } from '../lib/api';
-import { canEditBoard, INVALID_MOVE_PENALTY_SECONDS, resolveStatusAfterMove } from '../lib/gameStatus';
+import {
+  applyAsyncError,
+  applyMovePreview,
+  applyNewGame,
+  applyNotesValue,
+  beginMoveValidation,
+  clearCellValue,
+  createInitialGameState,
+  createMoveErrorMessage,
+  createMovePreview,
+  createStartGameErrorMessage,
+  finishLoading,
+  getEditableSelection,
+  hasEmptyCells,
+  moveSelection as moveSelectionInState,
+  resetPuzzle as resetPuzzleInState,
+  selectCell as selectCellInState,
+  startGameLoading,
+  tickTimer,
+  toNumberBoard,
+  toggleNotesMode as toggleNotesModeInState,
+  togglePause as togglePauseInState,
+  undoMove,
+} from '../lib/gameState';
 import { loadBestScores, saveBestScores } from '../lib/score';
-import { BoardSnapshot, CellState, Difficulty, GameState } from '../types';
-
-function createCellStateBoard(puzzle: number[][]): CellState[][] {
-  return puzzle.map((row, rowIndex) =>
-    row.map((value, columnIndex) => ({
-      row: rowIndex,
-      col: columnIndex,
-      value,
-      isFixed: value !== 0,
-      isError: false,
-      notes: new Set<number>(),
-    })),
-  );
-}
-
-function cloneBoard(board: CellState[][]): CellState[][] {
-  return board.map((row) => row.map((cell) => ({ ...cell, notes: new Set(cell.notes) })));
-}
-
-function createBoardSnapshot(board: CellState[][], mistakes: number): BoardSnapshot {
-  return {
-    board: cloneBoard(board),
-    mistakes,
-  };
-}
-
-function hasEmptyCells(board: CellState[][]): boolean {
-  return board.some((row) => row.some((cell) => cell.value === 0));
-}
-
-function toNumberBoard(board: CellState[][]): number[][] {
-  return board.map((row) => row.map((cell) => cell.value));
-}
+import { Difficulty, GameState } from '../types';
 
 export function useSudoku() {
-  const [gameState, setGameState] = useState<GameState>(() => ({
-    board: [],
-    gameToken: null,
-    difficulty: 'easy',
-    status: 'playing',
-    timer: 0,
-    mistakes: 0,
-    notesMode: false,
-    selectedCell: null,
-    history: [],
-    isLoading: false,
-    errorMessage: null,
-    bestScores: loadBestScores(),
-  }));
+  const [gameState, setGameState] = useState<GameState>(() => createInitialGameState(loadBestScores()));
 
   const startNewGame = useCallback(async (difficulty: Difficulty = gameState.difficulty) => {
-    setGameState((prev) => ({
-      ...prev,
-      difficulty,
-      isLoading: true,
-      errorMessage: null,
-      selectedCell: null,
-    }));
+    setGameState((prev) => startGameLoading(prev, difficulty));
 
     try {
-      const { puzzle, gameToken } = await createGame({ difficulty });
-      const initialBoard = createCellStateBoard(puzzle);
+      const response = await createGame({ difficulty });
 
-      setGameState((prev) => ({
-        board: initialBoard,
-        gameToken,
-        difficulty,
-        status: 'playing',
-        timer: 0,
-        mistakes: 0,
-        notesMode: false,
-        selectedCell: null,
-        history: [createBoardSnapshot(initialBoard, 0)],
-        isLoading: false,
-        errorMessage: null,
-        bestScores: prev.bestScores,
-      }));
+      setGameState((prev) => applyNewGame(prev, difficulty, response));
     } catch (error) {
-      setGameState((prev) => ({
-        ...prev,
-        isLoading: false,
-        errorMessage:
-          error instanceof Error
-            ? `Unable to start a new game. ${error.message}`
-            : 'Unable to start a new game. Check the connection and try again.',
-      }));
+      setGameState((prev) => applyAsyncError(prev, createStartGameErrorMessage(error)));
     }
   }, [gameState.difficulty]);
 
@@ -103,84 +55,44 @@ export function useSudoku() {
   }, [gameState.board.length, gameState.errorMessage, gameState.gameToken, gameState.isLoading, startNewGame]);
 
   useEffect(() => {
-    let interval: NodeJS.Timeout;
-    if (gameState.status === 'playing') {
-      interval = setInterval(() => {
-        setGameState((prev) => ({ ...prev, timer: prev.timer + 1 }));
-      }, 1000);
-    }
-    return () => clearInterval(interval);
-  }, [gameState.status]);
-
-  const selectCell = (row: number, col: number) => {
-    if (gameState.isLoading || !canEditBoard(gameState.status)) return;
-    setGameState((prev) => ({ ...prev, selectedCell: { row, col } }));
-  };
-
-  const moveSelection = (dRow: number, dCol: number) => {
-    if (gameState.isLoading || !gameState.selectedCell || !canEditBoard(gameState.status)) return;
-    const newRow = Math.max(0, Math.min(8, gameState.selectedCell.row + dRow));
-    const newCol = Math.max(0, Math.min(8, gameState.selectedCell.col + dCol));
-    setGameState((prev) => ({ ...prev, selectedCell: { row: newRow, col: newCol } }));
-  };
-
-  const setCellValue = useCallback(async (value: number) => {
-    if (
-      gameState.isLoading ||
-      !gameState.selectedCell ||
-      !gameState.gameToken ||
-      !canEditBoard(gameState.status)
-    ) {
+    if (gameState.status !== 'playing') {
       return;
     }
 
-    const { row, col } = gameState.selectedCell;
-    const selectedCell = gameState.board[row]?.[col];
-    if (!selectedCell || selectedCell.isFixed) return;
+    const interval = window.setInterval(() => {
+      setGameState((prev) => tickTimer(prev));
+    }, 1000);
+
+    return () => window.clearInterval(interval);
+  }, [gameState.status]);
+
+  const selectCell = useCallback((row: number, col: number) => {
+    setGameState((prev) => selectCellInState(prev, row, col));
+  }, []);
+
+  const moveSelection = useCallback((dRow: number, dCol: number) => {
+    setGameState((prev) => moveSelectionInState(prev, dRow, dCol));
+  }, []);
+
+  const setCellValue = useCallback(async (value: number) => {
+    const selection = getEditableSelection(gameState);
+    if (!selection || !gameState.gameToken) {
+      return;
+    }
+
+    const { row, col } = selection;
 
     if (gameState.notesMode) {
-      const updatedBoard = cloneBoard(gameState.board);
-      const updatedCell = updatedBoard[row][col];
-
-      if (value === 0) {
-        updatedCell.notes.clear();
-      } else if (updatedCell.notes.has(value)) {
-        updatedCell.notes.delete(value);
-      } else {
-        updatedCell.notes.add(value);
-      }
-
-      updatedCell.value = 0;
-      updatedCell.isError = false;
-
-      setGameState((prev) => ({
-        ...prev,
-        board: updatedBoard,
-        history: [...prev.history, createBoardSnapshot(updatedBoard, prev.mistakes)],
-      }));
+      setGameState((prev) => applyNotesValue(prev, row, col, value));
       return;
     }
 
     if (value === 0) {
-      const updatedBoard = cloneBoard(gameState.board);
-      const updatedCell = updatedBoard[row][col];
-      updatedCell.value = 0;
-      updatedCell.notes.clear();
-      updatedCell.isError = false;
-
-      setGameState((prev) => ({
-        ...prev,
-        board: updatedBoard,
-        history: [...prev.history, createBoardSnapshot(updatedBoard, prev.mistakes)],
-      }));
+      setGameState((prev) => clearCellValue(prev, row, col));
       return;
     }
 
-    setGameState((prev) => ({
-      ...prev,
-      isLoading: true,
-      errorMessage: null,
-    }));
+    setGameState((prev) => beginMoveValidation(prev));
 
     try {
       const moveResult = await validateMove({
@@ -191,116 +103,46 @@ export function useSudoku() {
       });
 
       if (moveResult.isFixedCell) {
-        setGameState((prev) => ({
-          ...prev,
-          isLoading: false,
-        }));
+        setGameState((prev) => finishLoading(prev));
         return;
       }
 
-      const updatedBoard = cloneBoard(gameState.board);
-      const updatedCell = updatedBoard[row][col];
-      updatedCell.value = value;
-      updatedCell.notes.clear();
-      updatedCell.isError = !moveResult.valid;
+      const movePreview = createMovePreview(gameState, row, col, value, moveResult);
+      let checkResult: CheckBoardResponse | undefined;
 
-      const nextMistakes = gameState.mistakes + (moveResult.valid ? 0 : 1);
-      const nextTimer = gameState.timer + (moveResult.valid ? 0 : INVALID_MOVE_PENALTY_SECONDS);
-      let nextStatus = resolveStatusAfterMove(gameState.status, false);
-      let nextBestScores = gameState.bestScores;
-
-      if (moveResult.valid && !hasEmptyCells(updatedBoard)) {
-        const checkResult = await checkBoard({
+      if (moveResult.valid && !hasEmptyCells(movePreview.board)) {
+        checkResult = await checkBoard({
           gameToken: gameState.gameToken,
-          board: toNumberBoard(updatedBoard),
+          board: toNumberBoard(movePreview.board),
         });
-
-        nextStatus = resolveStatusAfterMove(gameState.status, checkResult.solved);
-
-        if (!checkResult.solved) {
-          for (const invalidCell of checkResult.invalidCells) {
-            updatedBoard[invalidCell.row][invalidCell.col].isError = true;
-          }
-        } else {
-          const currentBestScore = gameState.bestScores[gameState.difficulty];
-          if (currentBestScore === null || nextTimer < currentBestScore) {
-            nextBestScores = {
-              ...gameState.bestScores,
-              [gameState.difficulty]: nextTimer,
-            };
-            saveBestScores(nextBestScores);
-          }
-        }
       }
 
-      setGameState((prev) => ({
-        ...prev,
-        board: updatedBoard,
-        mistakes: nextMistakes,
-        timer: nextTimer,
-        status: nextStatus,
-        history: [...prev.history, createBoardSnapshot(updatedBoard, nextMistakes)],
-        isLoading: false,
-        bestScores: nextBestScores,
-      }));
+      const nextState = applyMovePreview(gameState, movePreview, checkResult);
+      if (nextState.bestScores !== gameState.bestScores) {
+        saveBestScores(nextState.bestScores);
+      }
+
+      setGameState(nextState);
     } catch (error) {
-      setGameState((prev) => ({
-        ...prev,
-        isLoading: false,
-        errorMessage:
-          error instanceof Error
-            ? `Unable to validate that move. ${error.message}`
-            : 'Unable to validate that move. Try again.',
-      }));
+      setGameState((prev) => applyAsyncError(prev, createMoveErrorMessage(error)));
     }
   }, [gameState]);
 
-  const toggleNotesMode = () => {
-    if (gameState.isLoading || !canEditBoard(gameState.status)) return;
-    setGameState((prev) => ({ ...prev, notesMode: !prev.notesMode }));
-  };
+  const toggleNotesMode = useCallback(() => {
+    setGameState((prev) => toggleNotesModeInState(prev));
+  }, []);
 
-  const undo = () => {
-    setGameState((prev) => {
-      if (prev.history.length <= 1) return prev;
-      const newHistory = prev.history.slice(0, -1);
-      const previousSnapshot = newHistory[newHistory.length - 1];
-      return {
-        ...prev,
-        board: cloneBoard(previousSnapshot.board),
-        mistakes: previousSnapshot.mistakes,
-        history: newHistory,
-      };
-    });
-  };
+  const undo = useCallback(() => {
+    setGameState((prev) => undoMove(prev));
+  }, []);
 
-  const resetPuzzle = () => {
-    setGameState((prev) => {
-      if (prev.history.length === 0) return prev;
-      const initialSnapshot = prev.history[0];
-      return {
-        ...prev,
-        board: cloneBoard(initialSnapshot.board),
-        history: [createBoardSnapshot(initialSnapshot.board, 0)],
-        mistakes: 0,
-        timer: 0,
-        status: 'playing',
-        selectedCell: null,
-      };
-    });
-  };
+  const resetPuzzle = useCallback(() => {
+    setGameState((prev) => resetPuzzleInState(prev));
+  }, []);
 
-  const togglePause = () => {
-    setGameState((prev) => ({
-      ...prev,
-      status:
-        prev.status === 'playing'
-          ? 'paused'
-          : prev.status === 'paused'
-            ? 'playing'
-            : prev.status,
-    }));
-  };
+  const togglePause = useCallback(() => {
+    setGameState((prev) => togglePauseInState(prev));
+  }, []);
 
   return {
     gameState,
