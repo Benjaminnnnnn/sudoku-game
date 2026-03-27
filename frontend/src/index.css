@@ -1,30 +1,39 @@
-@import url('https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@300;400;500;600;700&family=Russo+One&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Manrope:wght@400;500;600;700;800&display=swap');
 @import "tailwindcss";
 
 :root {
-  --page-bg: #f5f7fb;
-  --page-ink: #13233f;
-  --panel: rgba(255, 255, 255, 0.82);
-  --panel-strong: rgba(255, 255, 255, 0.94);
-  --line: rgba(44, 76, 131, 0.16);
-  --accent: #2563eb;
-  --accent-strong: #173b8f;
-  --accent-soft: #dbe7ff;
-  --warning: #f97316;
-  --good: #0f766e;
-  --danger: #dc2626;
+  --page-bg: oklch(0.97 0.015 82);
+  --page-bg-strong: oklch(0.94 0.026 78);
+  --page-ink: oklch(0.3 0.045 42);
+  --muted-ink: oklch(0.5 0.03 44);
+  --panel: color-mix(in oklab, white 82%, oklch(0.92 0.025 80));
+  --panel-strong: color-mix(in oklab, white 92%, oklch(0.94 0.025 78));
+  --line: color-mix(in oklab, var(--page-ink) 12%, white);
+  --line-strong: color-mix(in oklab, var(--page-ink) 22%, white);
+  --accent: oklch(0.68 0.12 52);
+  --accent-strong: oklch(0.47 0.1 48);
+  --accent-soft: oklch(0.9 0.04 70);
+  --good: oklch(0.57 0.08 155);
+  --danger: oklch(0.59 0.17 28);
+  --board-outer: oklch(0.46 0.035 42);
+  --board-line: oklch(0.82 0.028 74);
+  --cell-bg: color-mix(in oklab, white 92%, var(--page-bg) 8%);
+  --cell-highlight: oklch(0.95 0.028 80);
+  --cell-match: oklch(0.91 0.055 68);
+  --cell-selected: oklch(0.82 0.095 60);
+  --cell-error: oklch(0.91 0.075 28);
 }
 
 @theme {
-  --font-sans: "Chakra Petch", sans-serif;
-  --font-display: "Russo One", sans-serif;
+  --font-sans: "Manrope", sans-serif;
+  --font-display: "Fraunces", serif;
 }
 
 html {
   background:
-    radial-gradient(circle at top left, rgba(249, 115, 22, 0.2), transparent 28%),
-    radial-gradient(circle at top right, rgba(37, 99, 235, 0.18), transparent 24%),
-    linear-gradient(180deg, #eef4ff 0%, #f8fafc 38%, #eef2ff 100%);
+    radial-gradient(circle at top left, color-mix(in oklab, var(--accent) 18%, transparent) 0%, transparent 36%),
+    radial-gradient(circle at top right, color-mix(in oklab, var(--good) 14%, transparent) 0%, transparent 30%),
+    linear-gradient(180deg, var(--page-bg) 0%, color-mix(in oklab, var(--page-bg) 75%, white) 45%, var(--page-bg-strong) 100%);
   min-height: 100%;
   overflow-x: hidden;
 }
@@ -32,11 +41,11 @@ html {
 body {
   min-height: 100vh;
   color: var(--page-ink);
-  font-family: "Chakra Petch", sans-serif;
+  font-family: "Manrope", sans-serif;
   background:
-    linear-gradient(90deg, rgba(19, 35, 63, 0.035) 1px, transparent 1px),
-    linear-gradient(rgba(19, 35, 63, 0.035) 1px, transparent 1px);
-  background-size: 36px 36px;
+    radial-gradient(circle at 1px 1px, color-mix(in oklab, var(--page-ink) 12%, transparent) 1px, transparent 0),
+    linear-gradient(180deg, color-mix(in oklab, white 32%, transparent), transparent 38%);
+  background-size: 28px 28px, auto;
   overflow-x: hidden;
 }
 
@@ -51,19 +60,19 @@ h3 {
 }
 
 ::selection {
-  background: rgba(37, 99, 235, 0.24);
+  background: color-mix(in oklab, var(--accent) 26%, white);
 }
 
 button,
 select {
   cursor: pointer;
   touch-action: manipulation;
-  -webkit-tap-highlight-color: rgba(37, 99, 235, 0.16);
+  -webkit-tap-highlight-color: color-mix(in oklab, var(--accent) 18%, transparent);
 }
 
 button:focus-visible,
 select:focus-visible {
-  outline: 2px solid rgba(37, 99, 235, 0.45);
+  outline: 2px solid color-mix(in oklab, var(--accent) 56%, white);
   outline-offset: 2px;
 }
 
@@ -74,8 +83,8 @@ select:focus-visible {
   z-index: 50;
   transform: translateY(-200%);
   border-radius: 9999px;
-  background: #0f172a;
-  color: #fff;
+  background: var(--page-ink);
+  color: var(--panel-strong);
   padding: 0.75rem 1rem;
   font-size: 0.875rem;
   font-weight: 600;
@@ -84,6 +93,143 @@ select:focus-visible {
 
 .skip-link:focus-visible {
   transform: translateY(0);
+}
+
+.surface-panel {
+  position: relative;
+  border: 1px solid var(--line);
+  background:
+    linear-gradient(180deg, color-mix(in oklab, var(--panel-strong) 88%, white) 0%, color-mix(in oklab, var(--panel) 94%, var(--page-bg)) 100%);
+  border-radius: 2rem;
+  padding: clamp(1rem, 2vw, 1.5rem);
+  box-shadow:
+    0 24px 60px rgba(84, 64, 42, 0.12),
+    inset 0 1px 0 rgba(255, 255, 255, 0.6);
+}
+
+.surface-panel::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.32), transparent 35%);
+  pointer-events: none;
+}
+
+.meta-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  border-radius: 9999px;
+  border: 1px solid var(--line);
+  background: color-mix(in oklab, white 88%, var(--page-bg));
+  padding: 0.55rem 0.9rem;
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--muted-ink);
+  box-shadow: 0 10px 24px rgba(84, 64, 42, 0.06);
+}
+
+.primary-action,
+.secondary-action,
+.control-select,
+.tool-button,
+.digit-button {
+  position: relative;
+  border-radius: 1.35rem;
+  transition:
+    transform 180ms ease,
+    border-color 180ms ease,
+    background-color 180ms ease,
+    color 180ms ease,
+    box-shadow 180ms ease,
+    opacity 180ms ease;
+}
+
+.primary-action:hover,
+.secondary-action:hover,
+.tool-button:hover,
+.digit-button:hover {
+  transform: translateY(-1px);
+}
+
+.primary-action:disabled,
+.secondary-action:disabled,
+.tool-button:disabled,
+.digit-button:disabled,
+.control-select:disabled {
+  transform: none;
+  opacity: 0.55;
+}
+
+.primary-action {
+  border: 1px solid color-mix(in oklab, var(--accent) 50%, white);
+  background: linear-gradient(180deg, var(--accent) 0%, color-mix(in oklab, var(--accent-strong) 82%, var(--accent)) 100%);
+  color: white;
+  padding: 0.95rem 1.1rem;
+  font-size: 0.82rem;
+  font-weight: 800;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  box-shadow: 0 18px 38px rgba(164, 96, 47, 0.22);
+}
+
+.primary-action:hover {
+  box-shadow: 0 22px 44px rgba(164, 96, 47, 0.26);
+}
+
+.secondary-action,
+.control-select,
+.tool-button,
+.digit-button {
+  border: 1px solid var(--line);
+  background: color-mix(in oklab, white 92%, var(--page-bg));
+  color: var(--page-ink);
+  box-shadow: 0 10px 24px rgba(84, 64, 42, 0.06);
+}
+
+.secondary-action,
+.control-select {
+  padding: 0.95rem 1rem;
+  font-size: 0.82rem;
+  font-weight: 800;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+.secondary-action:hover,
+.control-select:hover,
+.tool-button:hover,
+.digit-button:hover {
+  border-color: var(--line-strong);
+  background: white;
+}
+
+.tool-button {
+  color: var(--muted-ink);
+}
+
+.digit-button {
+  color: var(--page-ink);
+}
+
+.digit-button:active {
+  transform: translateY(0);
+  background: color-mix(in oklab, var(--accent-soft) 76%, white);
+}
+
+.board-shell {
+  padding: clamp(0.7rem, 1.8vw, 1rem);
+  border-radius: 2rem;
+  border: 1px solid color-mix(in oklab, var(--accent) 16%, white);
+  background:
+    radial-gradient(circle at top left, color-mix(in oklab, var(--accent) 18%, transparent), transparent 36%),
+    linear-gradient(180deg, color-mix(in oklab, white 84%, var(--accent-soft)) 0%, color-mix(in oklab, white 72%, var(--page-bg)) 100%);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.8),
+    0 28px 60px rgba(84, 64, 42, 0.12);
 }
 
 @media (prefers-reduced-motion: reduce) {

@@ -38,34 +38,26 @@ export const SudokuBoard: React.FC = () => {
   if (board.length === 0) return null;
 
   const selectedValue = selectedCell ? board[selectedCell.row][selectedCell.col].value : 0;
+  const statusLabel = status === 'paused' ? 'Paused' : status === 'completed' ? 'Solved' : 'Live';
 
   return (
-    <section aria-labelledby="board-title" className="flex min-h-0 flex-col rounded-[2rem] border border-white/80 bg-[rgba(255,255,255,0.78)] p-3 shadow-[0_24px_60px_rgba(15,23,42,0.12)] backdrop-blur-sm sm:p-4">
-      <div className="mb-3 flex flex-wrap items-center justify-between gap-3">
-        <div>
-          <div className="text-xs font-semibold uppercase tracking-[0.22em] text-slate-500">Grid</div>
-          <h2 id="board-title" className="mt-1 font-display text-xl uppercase tracking-[0.08em] text-slate-900 sm:text-2xl">Board Matrix</h2>
+    <section aria-label="Sudoku board area" className="surface-panel flex min-h-0 flex-col gap-4">
+      <div className="flex flex-wrap items-center justify-between gap-2">
+        <div className="flex flex-wrap gap-2">
+          <span className="meta-pill" data-testid="board-status">{statusLabel}</span>
+          {selectedValue !== 0 ? <span className="meta-pill">Tracking {selectedValue}</span> : null}
         </div>
-        <div className="flex flex-wrap items-center gap-2">
-          {selectedValue !== 0 ? (
-            <span className="rounded-full border border-blue-200 bg-blue-50 px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.18em] text-blue-700 sm:text-[11px]">
-              Tracking {selectedValue}
-            </span>
-          ) : null}
-          <div className="rounded-full border border-slate-200 bg-white px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.18em] text-slate-600 sm:text-[11px]">
-            <span data-testid="board-status">
-              {status === 'paused' ? 'Paused' : status === 'completed' ? 'Solved' : 'Active'}
-            </span>
-          </div>
+        <div className="text-[0.72rem] uppercase tracking-[0.18em] text-[color:var(--muted-ink)]">
+          Row, column, and box stay highlighted
         </div>
       </div>
 
       <div className="flex min-h-0 flex-1 items-center justify-center">
-        <div className="relative mx-auto aspect-square w-full max-w-[min(42rem,calc(100vw-2rem),calc(100dvh-23rem))] overflow-hidden rounded-[1.4rem] border border-[#b9caef] bg-[#d7e5ff] p-2.5 shadow-[inset_0_1px_0_rgba(255,255,255,0.75)] sm:max-w-[min(42rem,calc(100vw-3rem),calc(100dvh-21rem))] sm:p-3 md:max-w-[min(42rem,calc(100vw-21rem),calc(100dvh-13rem))] lg:max-w-[min(42rem,calc(100vw-23rem),calc(100dvh-12rem))] xl:max-w-[min(42rem,calc(100vw-26rem),calc(100dvh-12rem))]">
+        <div className="board-shell relative mx-auto aspect-square w-full max-w-[min(39rem,calc(100vw-2.5rem),calc(100dvh-18rem))] overflow-hidden sm:max-w-[min(40rem,calc(100vw-4rem),calc(100dvh-17rem))] xl:max-w-[min(40rem,calc(100vw-25rem),calc(100dvh-13rem))]">
           <div
             role="group"
             aria-label="Sudoku board"
-            className="grid h-full w-full grid-cols-9 grid-rows-9 overflow-hidden rounded-[1rem] border-2 border-slate-900 bg-slate-900"
+            className="grid h-full w-full grid-cols-9 grid-rows-9 overflow-hidden rounded-[1.45rem] border-[3px] border-[color:var(--board-outer)] bg-[color:var(--board-outer)]"
           >
             {board.map((row, r) =>
               row.map((cell, c) => {
@@ -96,18 +88,18 @@ export const SudokuBoard: React.FC = () => {
           {status === 'paused' && (
             <div
               data-testid="paused-overlay"
-              className="absolute inset-0 z-10 flex items-center justify-center bg-white/70 backdrop-blur-sm"
+              className="absolute inset-0 z-10 flex items-center justify-center bg-[color:color-mix(in_oklab,var(--page-bg)_74%,white)]/85 backdrop-blur-sm"
             >
-              <span className="font-display text-4xl uppercase tracking-[0.08em] text-slate-900">Paused</span>
+              <span className="font-display text-4xl text-[color:var(--page-ink)] sm:text-5xl">Paused</span>
             </div>
           )}
           {gameState.isLoading && board.length > 0 && (
             <div
               role="status"
               aria-live="polite"
-              className="absolute inset-0 z-10 flex items-center justify-center bg-white/60 backdrop-blur-sm"
+              className="absolute inset-0 z-10 flex items-center justify-center bg-white/68 backdrop-blur-sm"
             >
-              <span className="rounded-full border border-slate-200 bg-white px-5 py-2 text-sm font-semibold uppercase tracking-[0.18em] text-slate-700 shadow-[0_12px_24px_rgba(15,23,42,0.08)]">
+              <span className="meta-pill bg-white/90">
                 Working…
               </span>
             </div>
@@ -117,15 +109,15 @@ export const SudokuBoard: React.FC = () => {
               data-testid="solved-overlay"
               role="status"
               aria-live="polite"
-              className="absolute inset-0 z-10 flex items-center justify-center bg-emerald-100/75 backdrop-blur-sm"
+              className="absolute inset-0 z-10 flex items-center justify-center bg-[color:color-mix(in_oklab,var(--good)_16%,white)]/82 backdrop-blur-sm"
             >
-              <div className="rounded-[1.6rem] border border-emerald-200 bg-white/90 px-8 py-7 text-center shadow-[0_24px_60px_rgba(15,118,110,0.15)]">
-                <span className="mb-2 block font-display text-4xl uppercase tracking-[0.08em] text-emerald-700">Solved!</span>
-                <span className="block text-sm font-semibold uppercase tracking-[0.18em] text-emerald-700">Time</span>
-                <span className="block font-mono text-xl tabular-nums text-emerald-950">{formatScore(gameState.timer)}</span>
-                <span className="mt-3 block text-sm font-semibold uppercase tracking-[0.18em] text-emerald-700">Final Score</span>
-                <span className="block font-display text-3xl uppercase tracking-[0.06em] tabular-nums text-emerald-900">{gameState.timer}</span>
-                <span className="mt-2 block text-xs font-medium uppercase tracking-[0.16em] text-emerald-700">
+              <div className="rounded-[2rem] border border-[color:color-mix(in_oklab,var(--good)_24%,white)] bg-white/92 px-8 py-7 text-center shadow-[0_28px_70px_rgba(72,112,94,0.18)]">
+                <span className="mb-2 block font-display text-4xl text-[color:var(--good)] sm:text-5xl">Solved</span>
+                <span className="block text-[0.72rem] font-semibold uppercase tracking-[0.2em] text-[color:var(--good)]">Time</span>
+                <span className="block font-mono text-xl tabular-nums text-[color:var(--page-ink)]">{formatScore(gameState.timer)}</span>
+                <span className="mt-3 block text-[0.72rem] font-semibold uppercase tracking-[0.2em] text-[color:var(--good)]">Score</span>
+                <span className="block font-display text-3xl tabular-nums text-[color:var(--page-ink)]">{gameState.timer}</span>
+                <span className="mt-2 block text-[0.7rem] font-medium uppercase tracking-[0.16em] text-[color:var(--good)]">
                   Best {gameState.bestScores[gameState.difficulty] === null ? '--' : gameState.bestScores[gameState.difficulty]}
                 </span>
               </div>
@@ -134,8 +126,8 @@ export const SudokuBoard: React.FC = () => {
         </div>
       </div>
 
-      <div className="mt-3 text-[10px] font-medium uppercase tracking-[0.14em] text-slate-500 sm:text-xs">
-        Selection highlights matching row, column, and box.
+      <div className="text-[0.72rem] uppercase tracking-[0.18em] text-[color:var(--muted-ink)]">
+        Arrow keys move. Numbers place. Delete clears.
       </div>
     </section>
   );

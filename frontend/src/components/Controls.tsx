@@ -7,19 +7,19 @@ export const Controls: React.FC = () => {
   const { state, actions, meta } = useSudokuGame();
   const { notesMode } = state;
   const { controlsDisabled } = meta;
-  const controlButtonClass =
-    'flex min-h-[clamp(3.9rem,9vw,5rem)] flex-col items-center justify-center gap-1.5 rounded-[1.15rem] border border-slate-200 bg-white px-2 py-3 text-slate-600 shadow-[0_10px_24px_rgba(15,23,42,0.06)] transition-[transform,border-color,color,background-color,opacity] duration-200 hover:-translate-y-0.5 hover:border-slate-300 hover:text-blue-700 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600 disabled:translate-y-0 disabled:opacity-50 disabled:hover:text-slate-600';
+  const utilityButtonClass =
+    'tool-button flex min-h-[4.5rem] flex-col items-center justify-center gap-1.5 px-2 py-3 text-center';
 
   return (
-    <div className="flex w-full min-h-0 flex-col gap-4">
+    <div className="flex w-full min-h-0 flex-col gap-5">
       <div className="grid grid-cols-2 gap-2.5">
         <button
           type="button"
           onClick={actions.undo}
           disabled={controlsDisabled}
-          className={controlButtonClass}
+          className={utilityButtonClass}
         >
-          <div className="flex h-9 w-9 items-center justify-center rounded-full bg-slate-100">
+          <div className="flex h-9 w-9 items-center justify-center rounded-full bg-[color:var(--accent-soft)] text-[color:var(--accent-strong)]">
             <Undo2 size={20} aria-hidden="true" />
           </div>
           <span className="text-[11px] font-semibold uppercase tracking-[0.14em] sm:text-xs">Undo</span>
@@ -30,9 +30,9 @@ export const Controls: React.FC = () => {
             void actions.setCellValue(0);
           }}
           disabled={controlsDisabled}
-          className={controlButtonClass}
+          className={utilityButtonClass}
         >
-          <div className="flex h-9 w-9 items-center justify-center rounded-full bg-slate-100">
+          <div className="flex h-9 w-9 items-center justify-center rounded-full bg-[color:var(--accent-soft)] text-[color:var(--accent-strong)]">
             <Eraser size={20} aria-hidden="true" />
           </div>
           <span className="text-[11px] font-semibold uppercase tracking-[0.14em] sm:text-xs">Erase</span>
@@ -43,15 +43,15 @@ export const Controls: React.FC = () => {
           disabled={controlsDisabled}
           aria-pressed={notesMode}
           className={cn(
-            'flex min-h-[clamp(3.9rem,9vw,5rem)] flex-col items-center justify-center gap-1.5 rounded-[1.15rem] border px-2 py-3 shadow-[0_10px_24px_rgba(15,23,42,0.06)] transition-[transform,border-color,color,background-color,opacity] duration-200 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600 disabled:opacity-50',
+            utilityButtonClass,
             notesMode
-              ? 'border-blue-200 bg-blue-50 text-blue-700'
-              : 'border-slate-200 bg-white text-slate-600 hover:-translate-y-0.5 hover:border-slate-300 hover:text-blue-700'
+              ? 'border-[color:var(--accent)] bg-[color:var(--accent)] text-white shadow-[0_14px_34px_rgba(160,92,45,0.22)]'
+              : ''
           )}
         >
           <div className={cn(
             'flex h-9 w-9 items-center justify-center rounded-full transition-colors',
-            notesMode ? 'bg-blue-100' : 'bg-slate-100'
+            notesMode ? 'bg-white/20 text-white' : 'bg-[color:var(--accent-soft)] text-[color:var(--accent-strong)]'
           )}>
             <Pencil size={20} aria-hidden="true" />
           </div>
@@ -61,9 +61,9 @@ export const Controls: React.FC = () => {
           type="button"
           onClick={actions.resetPuzzle}
           disabled={controlsDisabled}
-          className={controlButtonClass}
+          className={utilityButtonClass}
         >
-          <div className="flex h-9 w-9 items-center justify-center rounded-full bg-slate-100">
+          <div className="flex h-9 w-9 items-center justify-center rounded-full bg-[color:var(--accent-soft)] text-[color:var(--accent-strong)]">
             <RotateCcw size={20} aria-hidden="true" />
           </div>
           <span className="text-[11px] font-semibold uppercase tracking-[0.14em] sm:text-xs">Reset</span>
@@ -71,7 +71,10 @@ export const Controls: React.FC = () => {
       </div>
 
       <div className="min-h-0">
-        <div className="mb-2 text-xs font-semibold uppercase tracking-[0.2em] text-slate-500">Number Pad</div>
+        <div className="mb-2 flex items-center justify-between gap-3">
+          <div className="text-[0.7rem] font-semibold uppercase tracking-[0.22em] text-[color:var(--muted-ink)]">Digits</div>
+          <div className="text-[0.7rem] uppercase tracking-[0.18em] text-[color:var(--muted-ink)]">Keyboard works too</div>
+        </div>
         <div className="grid grid-cols-3 gap-2.5">
           {[1, 2, 3, 4, 5, 6, 7, 8, 9].map((num) => (
             <button
@@ -82,7 +85,7 @@ export const Controls: React.FC = () => {
               }}
               disabled={controlsDisabled}
               aria-label={`Place ${num}`}
-              className="aspect-square rounded-[1rem] border border-slate-200 bg-white text-[1.6rem] font-semibold text-slate-900 shadow-[0_10px_24px_rgba(15,23,42,0.06)] transition-[transform,border-color,color,background-color,opacity] duration-150 hover:-translate-y-0.5 hover:border-blue-200 hover:bg-blue-50 hover:text-blue-700 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600 active:bg-blue-100 disabled:translate-y-0 disabled:opacity-50 sm:text-[1.85rem]"
+              className="digit-button aspect-square text-[1.55rem] font-semibold sm:text-[1.8rem]"
             >
               {num}
             </button>
